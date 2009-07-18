@@ -1,0 +1,5 @@
+let b:CommentType = "sh"
+let b:beginOfCommentSingle = "# "
+let b:endOfCommentSingle = ""
+let b:beginOfCommentMulti = ""
+let b:endOfCommentMulti = "" 
