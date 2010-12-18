@@ -1,143 +1,165 @@
-" ir_black color scheme
-" More at: http://blog.infinitered.com/entries/show/8
 
-
-" ********************************************************************************
-" Standard colors used in all ir_black themes:
-" Note, x:x:x are RGB values
-"
-"  normal: #f6f3e8
-" 
-"  string: #A8FF60  168:255:96                   
-"    string inner (punc, code, etc): #00A0A0  0:160:160
-"  number: #FF73FD  255:115:253                 
-"  comments: #7C7C7C  124:124:124
-"  keywords: #96CBFE  150:203:254             
-"  operators: white
-"  class: #FFFFB6  255:255:182
-"  method declaration name: #FFD2A7  255:210:167
-"  regular expression: #E9C062  233:192:98
-"    regexp alternate: #FF8000  255:128:0
-"    regexp alternate 2: #B18A3D  177:138:61
-"  variable: #C6C5FE  198:197:254
-"  
-" Misc colors:
-"  red color (used for whatever): #FF6C60   255:108:96 
-"     light red: #FFB6B0   255:182:176
-"
-"  brown: #E18964  good for special
-"
-"  lightpurpleish: #FFCCFF
-" 
-" Interface colors:
-"  background color: black
-"  cursor (where underscore is used): #FFA560  255:165:96
-"  cursor (where block is used): white
-"  visual selection: #1D1E2C  
-"  current line: #151515  21:21:21
-"  search selection: #07281C  7:40:28
-"  line number: #3D3D3D  61:61:61
-
-
-" ********************************************************************************
-" The following are the preferred 16 colors for your terminal
-"           Colors      Bright Colors
-" Black     #4E4E4E     #7C7C7C
-" Red       #FF6C60     #FFB6B0
-" Green     #A8FF60     #CEFFAB
-" Yellow    #FFFFB6     #FFFFCB
-" Blue      #96CBFE     #FFFFCB
-" Magenta   #FF73FD     #FF9CFE
-" Cyan      #C6C5FE     #DFDFFE
-" White     #EEEEEE     #FFFFFF
-
-
-" ********************************************************************************
 set background=dark
+
 hi clear
 
 if exists("syntax_on")
-  syntax reset
+    syntax reset
 endif
 
 let colors_name = "ir_black"
 
+" normal text
+hi Normal           guifg=gray        guibg=#202020     gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
 
-"hi Example         guifg=NONE        guibg=NONE        gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
+" '~' and '@' at the end of the window, characters from
+" 'showbreak' and other characters that do not really exist in
+" the text (e.g., ">" displayed when a double-wide character
+" doesn't fit at the end of the line).
+hi NonText          guifg=brown       guibg=NONE        gui=NONE      ctermfg=brown       ctermbg=NONE        cterm=NONE
 
-" General colors
-"hi Normal           guifg=#f6f3e8     guibg=black       gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
-hi Normal           guifg=gray        guibg=black       gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
-hi NonText          guifg=#070707     guibg=black       gui=NONE      ctermfg=black       ctermbg=NONE        cterm=NONE
+" the character under the cursor
+hi Cursor           guifg=white       guibg=#ff0000     gui=NONE      ctermfg=black       ctermbg=white       cterm=NONE
 
-hi Cursor           guifg=black       guibg=white       gui=NONE      ctermfg=black       ctermbg=white       cterm=bold
+" Line number for ":number" and ":#" commands, and when 'number'
+" or 'relativenumber' option is set.
+hi LineNr           guifg=#707070     guibg=NONE        gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
 
-"hi lCursor          guifg=black       guibg=white       gui=NONE      ctermfg=black       ctermbg=white       cterm=NONE
-hi LineNr           guifg=#3D3D3D     guibg=black       gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
-
+" the column separating vertically split windows
 hi VertSplit        guifg=#202020     guibg=#202020     gui=NONE      ctermfg=darkgray    ctermbg=darkgray    cterm=NONE
-hi StatusLine       guifg=#CCCCCC     guibg=#202020     gui=italic    ctermfg=white       ctermbg=darkgray    cterm=NONE
-hi StatusLineNC     guifg=black       guibg=#202020     gui=NONE      ctermfg=blue        ctermbg=darkgray    cterm=NONE  
 
+" status line of current window
+hi StatusLine       guifg=#DBDBDB     guibg=#3D3D3D     gui=italic    ctermfg=white       ctermbg=darkgray    cterm=NONE
+
+" status lines of not-current windows
+hi StatusLineNC     guifg=#989898     guibg=#3D3D3D     gui=NONE      ctermfg=gray        ctermbg=darkgray    cterm=NONE
+
+" line used for closed folds
 hi Folded           guifg=#a0a8b0     guibg=#384048     gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
-hi Title            guifg=#f6f3e8     guibg=NONE        gui=bold      ctermfg=NONE        ctermbg=NONE        cterm=NONE
-hi Visual           guifg=NONE        guibg=#262D51     gui=NONE      ctermfg=lightgray   ctermbg=darkgray    cterm=NONE
 
-hi SpecialKey       guifg=#808080     guibg=#343434     gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
+" titles for output from ":set all", ":autocmd" etc.
+hi Title            guifg=#f6f3e8     guibg=NONE        gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
 
-hi WildMenu         guifg=green       guibg=yellow      gui=NONE      ctermfg=black       ctermbg=yellow      cterm=NONE
-hi PmenuSbar        guifg=black       guibg=white       gui=NONE      ctermfg=black       ctermbg=white       cterm=NONE
-"hi Ignore           guifg=gray        guibg=black       gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
+" Visual mode selection
+hi Visual           guifg=NONE        guibg=#262Da0     gui=NONE      ctermfg=lightgray   ctermbg=darkgray    cterm=NONE
 
-hi Error            guifg=NONE        guibg=NONE        gui=undercurl ctermfg=white       ctermbg=red         cterm=NONE     guisp=#FF6C60 " undercurl color
-hi ErrorMsg         guifg=white       guibg=#FF6C60     gui=BOLD      ctermfg=white       ctermbg=red         cterm=NONE
-hi WarningMsg       guifg=white       guibg=#FF6C60     gui=BOLD      ctermfg=white       ctermbg=red         cterm=NONE
+" Meta and special keys listed with ":map", also for text used
+" to show unprintable characters in the text, 'listchars'.
+" Generally: text that is displayed differently from what it really is.
+hi SpecialKey       guifg=brown       guibg=NONE        gui=NONE      ctermfg=brown       ctermbg=NONE        cterm=NONE
 
-" Message displayed in lower left, such as --INSERT--
-hi ModeMsg          guifg=black       guibg=#C6C5FE     gui=BOLD      ctermfg=cyan        ctermbg=black       cterm=BOLD
+" current match in 'wildmenu' completion
+hi WildMenu         guifg=black       guibg=yellow      gui=NONE      ctermfg=black       ctermbg=yellow      cterm=NONE
+
+" error messages on the command line
+hi ErrorMsg         guifg=white       guibg=#FF6C60     gui=NONE      ctermfg=white       ctermbg=red         cterm=NONE
+
+" warning messages
+hi WarningMsg       guifg=white       guibg=#FF6C60     gui=NONE      ctermfg=white       ctermbg=red         cterm=NONE
+
+" 'showmode' message (e.g., "-- INSERT --")
+hi ModeMsg          guifg=cyan        guibg=NONE        gui=NONE      ctermfg=cyan        ctermbg=black       cterm=NONE
 
 if version >= 700 " Vim 7.x specific colors
-  hi CursorLine     guifg=NONE        guibg=#121212     gui=NONE      ctermfg=NONE        ctermbg=darkgray    cterm=BOLD
-  hi CursorColumn   guifg=NONE        guibg=#121212     gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=BOLD
-  hi MatchParen     guifg=#f6f3e8     guibg=#857b6f     gui=BOLD      ctermfg=white       ctermbg=darkgray    cterm=NONE
-  hi Pmenu          guifg=#f6f3e8     guibg=#444444     gui=NONE      ctermfg=gray        ctermbg=black       cterm=NONE
-  hi PmenuSel       guifg=#000000     guibg=#cae682     gui=NONE      ctermfg=white       ctermbg=black       cterm=NONE
-"  hi Search         guifg=NONE        guibg=NONE        gui=bold,underline ctermfg=NONE        ctermbg=NONE        cterm=bold,underline
+    " the screen line that the cursor is in when 'cursorline' is set
+    hi CursorLine    guifg=NONE        guibg=#2d2d2d     gui=NONE      ctermfg=yellow      ctermbg=blue        cterm=NONE
+
+    " the screen column that the cursor is in when 'cursorcolumn' is set
+    hi CursorColumn  guifg=NONE        guibg=#121212     gui=NONE      ctermfg=NONE        ctermbg=NONE        cterm=NONE
+
+    " The character under the cursor or just before it, if it is a paired bracket, and its match.
+    hi MatchParen    guifg=#f6f3e8     guibg=#857b6f     gui=NONE      ctermfg=white       ctermbg=darkgray    cterm=NONE
+
+    " Popup menu: normal item.
+    hi Pmenu         guifg=#f6f3e8     guibg=#444444     gui=NONE      ctermfg=gray        ctermbg=black       cterm=NONE
+
+    " Popup menu: selected item.
+    hi PmenuSel      guifg=#000000     guibg=#cae682     gui=NONE      ctermfg=white       ctermbg=black       cterm=NONE
+
+    " Popup menu: scrollbar.
+    hi PmenuSbar     guifg=black       guibg=white       gui=NONE      ctermfg=black       ctermbg=white       cterm=NONE
+
+    " Word that is not recognized by the spellchecker.
+    hi SpellBad      guifg=NONE        guibg=NONE        gui=undercurl ctermfg=black       ctermbg=red         cterm=NONE
 endif
 
-" Syntax highlighting
+if version >= 703
+    " used for the columns set with 'colorcolumn'
+    hi ColorColumn   guifg=NONE        guibg=#2d2d2d     gui=NONE      ctermfg=NONE        ctermbg=brown       cterm=NONE
+endif
+
+" any comment
 hi Comment          guifg=#7C7C7C     guibg=NONE        gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
+
+" a string constant: "this is a string"
 hi String           guifg=#A8FF60     guibg=NONE        gui=NONE      ctermfg=green       ctermbg=NONE        cterm=NONE
-"hi Number           guifg=#FF73FD     guibg=NONE        gui=NONE      ctermfg=magenta     ctermbg=NONE        cterm=NONE
-hi Number           guifg=magenta     guibg=NONE        gui=NONE      ctermfg=magenta     ctermbg=NONE        cterm=NONE
 
-"hi Keyword          guifg=#96CBFE     guibg=NONE        gui=NONE      ctermfg=blue        ctermbg=NONE        cterm=NONE
-hi Keyword          guifg=blue     guibg=NONE        gui=NONE      ctermfg=blue        ctermbg=NONE        cterm=NONE
-hi PreProc          guifg=#96CBFE     guibg=NONE        gui=NONE      ctermfg=blue        ctermbg=NONE        cterm=NONE
-"hi PreProc          guifg=blue     guibg=NONE        gui=NONE      ctermfg=blue        ctermbg=NONE        cterm=NONE
-hi Conditional      guifg=#6699CC     guibg=NONE        gui=NONE      ctermfg=blue        ctermbg=NONE        cterm=NONE  " if else end
-"hi Conditional      guifg=blue     guibg=NONE        gui=NONE      ctermfg=blue        ctermbg=NONE        cterm=NONE  " if else end
+" a number constant: 234, 0xff
+hi Number           guifg=#f570ff     guibg=NONE        gui=NONE      ctermfg=magenta     ctermbg=NONE        cterm=NONE
 
-hi Todo             guifg=#8f8f8f     guibg=NONE        gui=NONE      ctermfg=red         ctermbg=NONE        cterm=NONE
-"hi Constant         guifg=#99CC99     guibg=NONE        gui=NONE      ctermfg=cyan        ctermbg=NONE        cterm=NONE
-hi Constant         guifg=cyan     guibg=NONE        gui=NONE      ctermfg=cyan        ctermbg=NONE        cterm=NONE
+" any other keyword
+hi Keyword          guifg=blue        guibg=NONE        gui=NONE      ctermfg=blue        ctermbg=NONE        cterm=NONE
 
-"hi Identifier       guifg=#C6C5FE     guibg=NONE        gui=NONE      ctermfg=cyan        ctermbg=NONE        cterm=NONE
-hi Identifier       guifg=#13B81E     guibg=black        gui=NONE      ctermfg=darkgreen        ctermbg=black        cterm=NONE
-hi Function         guifg=#FFD2A7     guibg=NONE        gui=NONE      ctermfg=brown       ctermbg=NONE        cterm=NONE
-"hi Type             guifg=#FFFFB6     guibg=NONE        gui=NONE      ctermfg=yellow      ctermbg=NONE        cterm=NONE
-hi Type             guifg=yellow     guibg=NONE        gui=NONE      ctermfg=yellow      ctermbg=NONE        cterm=NONE
-hi Statement        guifg=#6699CC     guibg=NONE        gui=NONE      ctermfg=lightblue   ctermbg=NONE        cterm=NONE
+" generic Preprocessor
+hi PreProc          guifg=#5050FF     guibg=NONE        gui=NONE      ctermfg=blue        ctermbg=NONE        cterm=NONE
 
-hi Label            guifg=#A8FF60     guibg=NONE        gui=NONE      ctermfg=green   ctermbg=NONE        cterm=NONE
+" if, then, else, endif, switch, etc.
+hi Conditional      guifg=#6699CC     guibg=NONE        gui=NONE      ctermfg=darkcyan    ctermbg=NONE        cterm=NONE
 
-"hi Special          guifg=#E18964     guibg=NONE        gui=NONE      ctermfg=white       ctermbg=NONE        cterm=NONE
-hi Special          guifg=cyan     guibg=NONE        gui=NONE      ctermfg=cyan       ctermbg=NONE        cterm=NONE
-hi Delimiter        guifg=#00A0A0     guibg=NONE        gui=NONE      ctermfg=cyan        ctermbg=NONE        cterm=NONE
+" anything that needs extra attention; mostly the keywords TODO FIXME and XXX
+hi Todo             guifg=white       guibg=red         gui=NONE      ctermfg=white       ctermbg=red         cterm=NONE
+
+" any constant
+hi Constant         guifg=cyan        guibg=NONE        gui=NONE      ctermfg=cyan        ctermbg=NONE        cterm=NONE
+
+" any variable name
+hi Identifier       guifg=#13B81E     guibg=NONE        gui=NONE      ctermfg=darkgreen   ctermbg=NONE        cterm=NONE
+
+" function name (also: methods for classes)
+hi Function         guifg=#00b000     guibg=NONE        gui=NONE      ctermfg=darkgreen   ctermbg=NONE        cterm=NONE
+
+" int, long, char, etc.
+hi Type             guifg=yellow      guibg=NONE        gui=NONE      ctermfg=yellow      ctermbg=NONE        cterm=NONE
+
+" any statement
+hi Statement        guifg=#6699CC     guibg=NONE        gui=NONE      ctermfg=darkcyan    ctermbg=NONE        cterm=NONE
+
+" case, default, etc.
+hi Label            guifg=#FF7070     guibg=NONE        gui=NONE      ctermfg=red         ctermbg=NONE        cterm=NONE
+
+" any special symbol
+hi Special          guifg=cyan        guibg=NONE        gui=NONE      ctermfg=cyan        ctermbg=NONE        cterm=NONE
+
+" character that needs attention
+hi Delimiter        guifg=#00FFFF     guibg=NONE        gui=NONE      ctermfg=lightblue   ctermbg=NONE        cterm=NONE
+
+" character that needs attention from C-language
+hi cDelimiter       guifg=#00FFFF     guibg=NONE        gui=NONE      ctermfg=lightblue   ctermbg=NONE        cterm=NONE
+
+" "sizeof", "+", "*", etc.
 hi Operator         guifg=white       guibg=NONE        gui=NONE      ctermfg=white       ctermbg=NONE        cterm=NONE
 
+" Last search pattern highlighting
+hi Search           guifg=black       guibg=yellow      gui=NONE      ctermfg=black       ctermbg=yellow      cterm=NONE
+
+hi SignColumn       guifg=red         guibg=NONE        gui=NONE      ctermfg=red         ctermbg=NONE        cterm=NONE
+
+" Changed line
+hi DiffChange       guifg=NONE        guibg=brown       gui=NONE      ctermfg=NONE        ctermbg=brown       cterm=NONE
+
+" Added line
+hi DiffAdd          guifg=NONE        guibg=darkgreen   gui=NONE      ctermfg=NONE        ctermbg=darkblue    cterm=NONE
+
+" Deleted line
+hi DiffDelete       guifg=NONE        guibg=darkred     gui=NONE      ctermfg=NONE        ctermbg=darkred     cterm=NONE
+
+" Changed text within a changed line
+hi DiffText         guifg=NONE        guibg=darkmagenta gui=NONE      ctermfg=NONE        ctermbg=darkmagenta cterm=NONE
+
+hi Question         guifg=green       guibg=NONE        gui=NONE      ctermfg=green       ctermbg=NONE        cterm=NONE
+
 hi link Character       Constant
-hi link Boolean         Constant
+hi link Boolean         Type
 hi link Float           Number
 hi link Repeat          Statement
 hi link Label           Label
@@ -154,72 +176,3 @@ hi link SpecialChar     Special
 hi link SpecialComment  Special
 hi link Debug           Special
 
-
-" Special for Ruby
-hi rubyRegexp                  guifg=#B18A3D      guibg=NONE      gui=NONE      ctermfg=brown          ctermbg=NONE      cterm=NONE
-hi rubyRegexpDelimiter         guifg=#FF8000      guibg=NONE      gui=NONE      ctermfg=brown          ctermbg=NONE      cterm=NONE
-hi rubyEscape                  guifg=white        guibg=NONE      gui=NONE      ctermfg=cyan           ctermbg=NONE      cterm=NONE
-hi rubyInterpolationDelimiter  guifg=#00A0A0      guibg=NONE      gui=NONE      ctermfg=blue           ctermbg=NONE      cterm=NONE
-hi rubyControl                 guifg=#6699CC      guibg=NONE      gui=NONE      ctermfg=blue           ctermbg=NONE      cterm=NONE  "and break, etc
-"hi rubyGlobalVariable          guifg=#FFCCFF      guibg=NONE      gui=NONE      ctermfg=lightblue      ctermbg=NONE      cterm=NONE  "yield
-hi rubyStringDelimiter         guifg=#336633      guibg=NONE      gui=NONE      ctermfg=lightgreen     ctermbg=NONE      cterm=NONE
-"rubyInclude
-"rubySharpBang
-"rubyAccess
-"rubyPredefinedVariable
-"rubyBoolean
-"rubyClassVariable
-"rubyBeginEnd
-"rubyRepeatModifier
-"hi link rubyArrayDelimiter    Special  " [ , , ]
-"rubyCurlyBlock  { , , }
-
-hi link rubyClass             Keyword 
-hi link rubyModule            Keyword 
-hi link rubyKeyword           Keyword 
-hi link rubyOperator          Operator
-hi link rubyIdentifier        Identifier
-hi link rubyInstanceVariable  Identifier
-hi link rubyGlobalVariable    Identifier
-hi link rubyClassVariable     Identifier
-hi link rubyConstant          Type  
-
-
-" Special for Java
-" hi link javaClassDecl    Type
-hi link javaScopeDecl         Identifier 
-hi link javaCommentTitle      javaDocSeeTag 
-hi link javaDocTags           javaDocSeeTag 
-hi link javaDocParam          javaDocSeeTag 
-hi link javaDocSeeTagParam    javaDocSeeTag 
-
-hi javaDocSeeTag              guifg=#CCCCCC     guibg=NONE        gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
-hi javaDocSeeTag              guifg=#CCCCCC     guibg=NONE        gui=NONE      ctermfg=darkgray    ctermbg=NONE        cterm=NONE
-"hi javaClassDecl              guifg=#CCFFCC     guibg=NONE        gui=NONE      ctermfg=white       ctermbg=NONE        cterm=NONE
-
-
-" Special for XML
-hi link xmlTag          Keyword 
-hi link xmlTagName      Conditional 
-hi link xmlEndTag       Identifier 
-
-
-" Special for HTML
-hi link htmlTag         Keyword 
-hi link htmlTagName     Conditional 
-hi link htmlEndTag      Identifier 
-
-
-" Special for Javascript
-hi link javaScriptNumber      Number 
-
-
-" Special for Python
-"hi  link pythonEscape         Keyword      
-
-
-" Special for CSharp
-hi  link csXmlTag             Keyword      
-
-
-" Special for PHP

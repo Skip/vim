@@ -6,16 +6,20 @@
 "       AddIfndefGuard - adding header guard
 "       omnicppcomplete - autocomplete word in structures and etc...
 "       taglist - tags browsing
-"       vcscommand - version control
 "       vimcu - comments (simple, but usefull)
 "       keys a la windows :)
-"       manpageview - viewing man, info pages
 "------------------------------------------------------------------------------
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
   finish
 endif
+
+if v:version < 700
+    echoerr "This vimrc is for vim 7 and above"
+    finish
+endif
+
 
 
 "------------------------------------------------------------------------
@@ -25,10 +29,6 @@ endif
 
 " Включаем несовместимость настроек, я использую только VIM
 set nocompatible
-
-" Make sure you put this _before_ the ":syntax enable" command,
-" otherwise the colors will already have been set.
-set background=dark
 
 " Размер табуляции по умолчанию
 " 4 пробела на tab, используем для всего только пробелы
@@ -51,10 +51,14 @@ set noerrorbells
 set visualbell
 set vb t_vb=
 
-set virtualedit=all
+if has("virtualedit")
+    set virtualedit=all
+endif " has("virtualedit")
 
 " allow to use backspace instead of "x"
 set backspace=indent,eol,start whichwrap+=<,>,[,]
+
+set linebreak
 
 " backspace in Visual mode deletes selection
 vnoremap <BS> d
@@ -62,15 +66,14 @@ vnoremap <BS> d
 " Включаем "умные" отступы
 set smartindent
 
-" automatically save buffers when moving between
-"set autowrite
-
 " Никаких копий или своп файлов - надо использовать сервер контроля версий
 set nobackup
 set noswapfile
 
-" keep 100 lines of command line history
-set history=100
+if has("cmdline_hist")
+    " keep lines of command line history
+    set history=200
+endif
 
 " show the cursor position all the time
 set ruler
@@ -82,7 +85,9 @@ set showcmd
 set incsearch
 
 " Включаем нумерацию строк
-set number
+if has("linebreak")
+    set number
+endif " has("linebreak")
 
 " The screen will not be redrawn while executing macros,
 " registers and other commands that have not been typed.
@@ -92,7 +97,9 @@ set lazyredraw
 " Когда выключена нумерация строк или даже с ней, не совсем удобно,
 " что редактируемый текст прилипает к левому краю окна вима.
 " Проблему эту можно решить, сделав видимой колонку фолдинга:
-set foldcolumn=0
+if has("folding")
+    set foldcolumn=0
+endif " has("folding")
 
 " Поддержка мыши
 set mouse=a
@@ -118,52 +125,47 @@ let g:netrw_keepdir=1
 let g:netrw_list_hide='\(^\|\s\s\)\zs\.\S\+'
 let g:netrw_hide=1
 
-" настройки кодировок
-" используемая в vim (обычно соответствует locale)
-set encoding=utf-8
-" кодировка терминала (обычно соответствует locale)
-set termencoding=utf-8
-" используемая кодировка для файла
-" vim может пытаться автоматически определять (слева направо)
-set fileencodings=utf-8,koi8-r,cp1251,cp866
+if has("multi_byte_encoding")
+    " настройки кодировок
+    " используемая в vim (обычно соответствует locale)
+    set encoding=utf-8
+    " кодировка терминала (обычно соответствует locale)
+    set termencoding=utf-8
+    " используемая кодировка для файла
+    " vim может пытаться автоматически определять (слева направо)
+    set fileencodings=utf-8,koi8-r,cp1251,cp866
+endif " has("multi_byte_encoding")
 
 set ttyfast
 
-" Формат строки состояния
-set laststatus=2
+if has("statusline")
+    " Формат строки состояния
+    set laststatus=2
 
-set statusline=
-set statusline+=%F\                                                     " full path to the file in the buffer
-set statusline+=%y%m%r[%{&fileencoding}]                                " status flags
-set statusline+=%<[%{strftime(\"%d.%m.%y\",getftime(expand(\"%:p\")))}] "
-set statusline+=%k%=%-14.(%l,%v%)\                                      " cursor position
-set statusline+=%P                                                      " percentage through file of displayed window
+    if &diff
+        set statusline=%F
+    else
+        set statusline=
+        set statusline+=%F\                                                     " full path to the file in the buffer
+        set statusline+=%y%m%r[%{&fileencoding}]                                " status flags
+        set statusline+=%<[%{strftime(\"%d.%m.%y\",getftime(expand(\"%:p\")))}] "
+        set statusline+=%k%=%-14.(%l,%v%)\                                      " cursor position
+        set statusline+=%P                                                      " percentage through file of displayed window
+    endif
+endif " has("statusline")
 
 " отключаем replace mode
 " map R <Esc>
 imap <Ins> <Esc>i
 
-" Сохранить сессию
-set sessionoptions-=options
-nmap <F1> :mksession!<cr>
-imap <F1> <esc>:mksession!<cr>a
-let g:SessionMgr_AutoManage = 0
+if has("mksession")
+    " Сохранить сессию
+    " set sessionoptions-=options
+    nmap <F1> :mksession!<cr>
+    imap <F1> <esc>:mksession!<cr>a
+    let g:SessionMgr_AutoManage = 0
+endif " has("mksession")
 
-
-" вкл/выкл подсвечивание всех символов свыше 80
-function Highlight_80_symbol_toggle()
-    if exists("g:show_80")
-        unlet g:show_80
-        match NONE '\%>80v.\+'
-        echo "highlight 80 symbol off"
-    else
-        let g:show_80 = 1
-        match ErrorMsg '\%>80v.\+'
-        echo "highlight 80 symbol on"
-    endif
-endfunction
-
-nmap <C-s>d :call Highlight_80_symbol_toggle()<cr>
 
 
 
@@ -185,7 +187,7 @@ if &binary
     augroup END
 endif
 
-function HexToggle()
+function! HexToggle()
     if exists("g:hex_view")
         bd
         unlet g:hex_view
@@ -195,7 +197,7 @@ function HexToggle()
         let g:hex_view = 1
     endif
 endfunction
-    
+
 
 
 
@@ -206,9 +208,9 @@ endfunction
 
 
 " сохранить файл с sudo
-command Wsudo set buftype=nowrite | silent execute ':%w !sudo tee %' | set buftype= | e! %
+command! Wsudo set buftype=nowrite | silent execute ':%w !sudo tee %' | set buftype= | e! %
 
-" добавить header guard 
+" добавить header guard
 nmap <S-F4> :call AddIfndefGuard()<CR>
 imap <S-F4> <ESC>:call AddIfndefGuard()<CR>i
 
@@ -238,20 +240,20 @@ imap <PageDown> <C-o><C-d><C-o><C-d>
 nmap <C-Q> :qa<cr>
 imap <C-Q> <esc>:qa<cr>
 
-" 'умный' Home
-nmap <Home> ^
-imap <Home> <esc>I
 
 " Some people find spaces and tabs at the end of a line useless, wasteful, and
 " ugly.  To remove whitespace at the end of every line, execute the following
 " command: (c) vim help
 " удаляем лишние пробелы, табы в конце строк
 
-nmap <S-F7> :%s/\s\+$//<cr>
-imap <S-F7> <esc>:%s/\s\+$//<cr>
+" nmap <S-F7> :%s/\s\+$//<cr>
+" imap <S-F7> <esc>:%s/\s\+$//<cr>
+nnoremap <silent> <S-F7> :call <SID>StripTrailingWhitespaces()<CR>
+inoremap <silent> <S-F7> <esc>:call <SID>StripTrailingWhitespaces()<CR>a
 
 
 " показываем/скрываем табы, лишние завершающие пробелы
+set listchars=eol:$,tab:>-,trail:-,precedes:<,extends:>
 function! ListCharsToggle()
     if exists("g:show_list")
         unlet g:show_list
@@ -260,11 +262,11 @@ function! ListCharsToggle()
     else
         let g:show_list = 1
         set list
-        set listchars=tab:>-,trail:-
         echo "list"
     endif
 endfunction
-nmap <silent> <C-F3> :call ListCharsToggle()<cr>
+nnoremap <silent> <C-F3> :call ListCharsToggle()<cr>
+inoremap <silent> <C-F3> <esc>:call ListCharsToggle()<cr>a
 
 
 
@@ -288,6 +290,13 @@ imap <c-k> <Esc>:m-2<CR>==gi
 vmap <c-j> :m'>+<CR>gv=`<my`>mzgv`yo`z
 vmap <c-k> :m'<-2<CR>gv=`>my`<mzgv`yo`z
 
+nmap <leader>= :call ExecAstyle()<cr>
+function! ExecAstyle()
+    set equalprg=~/.vim/utils/astyle.sh
+    exe "normal gg=G"
+    set equalprg=
+endfunction
+
 " вставить новую строку находясь в нормальном режиме
 " внизу текущей строки
 nmap f o<esc>k
@@ -297,21 +306,43 @@ nmap <S-f> O<esc>j
 nmap <space> i<space><esc>
 
 
-" при пролистывании стрелками курсор не доходит до последней строки 
+" при пролистывании стрелками курсор не доходит до последней строки
 " на эту величину
-set scrolloff=2
+set scrolloff=3
 
 
-function Highlight_cursor_line_toggle()
-    if !exists("s:highlight_cursor")
-        match Todo /^.*\%#.*$/
-        let s:highlight_cursor = 1
-    else
-        match None
-        unlet s:highlight_cursor
-    endif
-endfunction
-map <C-f> <esc>:call Highlight_cursor_line_toggle()<cr>
+if has("syntax")
+
+    nmap <leader>s :set spell!<CR>
+    set spelllang=ru,en
+
+    " вкл/выкл подсвечивание всех символов свыше 80
+    function! Highlight_80_symbol_toggle()
+        if exists("g:show_80")
+            unlet g:show_80
+            match NONE '\%>80v.\+'
+            echo "highlight 80 symbol off"
+        else
+            let g:show_80 = 1
+            match ErrorMsg '\%>80v.\+'
+            echo "highlight 80 symbol on"
+        endif
+    endfunction
+
+    nmap <C-s>d :call Highlight_80_symbol_toggle()<cr>
+
+    function! Highlight_cursor_line_toggle()
+        if !exists("s:highlight_cursor")
+            match Todo /^.*\%#.*$/
+            let s:highlight_cursor = 1
+        else
+            match None
+            unlet s:highlight_cursor
+        endif
+    endfunction
+
+    map <C-f> <esc>:call Highlight_cursor_line_toggle()<cr>
+endif " has("syntax")
 
 
 
@@ -323,9 +354,9 @@ map <C-f> <esc>:call Highlight_cursor_line_toggle()<cr>
 " добавил в plugin возможность использовать моё окно для просмотра
 " результатов QFix()
 
-let Grep_Default_Filelist = '*.[chS] *.cpp'
+let Grep_Default_Filelist = '*.[cC] *.[hH] *.[sS] *.[cC][pP][pP] *.[cC][cC]'
 
-:let Grep_Skip_Dirs = '.svn .git CVS'
+let Grep_Skip_Dirs = '.svn .git CVS .hg'
 
 " найти слово под курсором
 
@@ -341,6 +372,14 @@ let Grep_Default_Filelist = '*.[chS] *.cpp'
 nmap <S-F8> :Rgrep<cr>
 imap <S-F8> <esc>:Rgrep<cr>
 
+func! InsertFileName()
+    let cmd = getcmdline() . expand("%:p:t")
+    " place the cursor on the )
+    call setcmdpos(strlen(cmd))
+    return cmd
+endfunc
+
+cmap <C-r><C-f> <C-\>eInsertFileName()<cr>
 
 
 
@@ -416,7 +455,7 @@ noremap <C-B>           <C-V>
 " For CTRL-V to work autoselect must be off.
 " On Unix we have two selections, autoselect can be used.
 if !has("unix")
-  set guioptions-=a
+  " set guioptions-=a
 endif
 
 
@@ -450,7 +489,7 @@ set guitablabel=%t
 "------------------------------------------------------------------------------
 
 if has("cscope")
-    set csprg=/usr/bin/cscope
+    set csprg=/home/skip/.vim/utils/cscope
 
     " The value of 'csto' determines the order in which |:cstag| performs a search.
     " If 'csto' is set to zero, cscope database(s) are searched first, followed
@@ -480,109 +519,128 @@ if has("cscope")
 
     " использовать окно QFix() для просмотра результата некоторых операций
     set cscopequickfix=s-,c-,d-,t-,i-,e-
-endif
 
 
-" If you use cscope as well as ctags, |:cstag| allows you to search one or
-" the other before making a jump.  For example, you can choose to first
-" search your cscope database(s) for a match, and if one is not found, then
-" your tags file(s) will be searched.  The order in which this happens
-" is determined by the value of |csto|.  See |cscope-options| for more
-" details.
-"
-" |:cstag| performs the equivalent of ":cs find g" on the identifier when
-" searching through the cscope database(s).
-"
-" |:cstag| performs the equivalent of |:tjump| on the identifier when searching
-" through your tags file(s).
-"imap <M-]> <esc>:cstag <C-R>=expand("<cword>")<CR><CR>
-nmap <leader>] :cstag <C-R>=expand("<cword>")<CR><CR>
+    " If you use cscope as well as ctags, |:cstag| allows you to search one or
+    " the other before making a jump.  For example, you can choose to first
+    " search your cscope database(s) for a match, and if one is not found, then
+    " your tags file(s) will be searched.  The order in which this happens
+    " is determined by the value of |csto|.  See |cscope-options| for more
+    " details.
+    "
+    " |:cstag| performs the equivalent of ":cs find g" on the identifier when
+    " searching through the cscope database(s).
+    "
+    " |:cstag| performs the equivalent of |:tjump| on the identifier when searching
+    " through your tags file(s).
+    "imap <M-]> <esc>:cstag <C-R>=expand("<cword>")<CR><CR>
+    nmap <leader>] :cstag <C-R>=expand("<cword>")<CR><CR>
 
-" 0 or s: Find this C symbol
-nmap <leader>0 :cs find s <C-R>=expand("<cword>")<CR><CR>
-imap <leader>0 <esc>:cs find s <C-R>=expand("<cword>")<CR><CR>
+    " 0 or s: Find this C symbol
+    "nmap <leader>0 :cs find s <C-R>=expand("<cword>")<CR><CR>
+    "imap <leader>0 <esc>:cs find s <C-R>=expand("<cword>")<CR><CR>
 
-" 1 or g: Find this definition
-nmap <leader>1 :cs find g <C-R>=expand("<cword>")<CR><CR>
-imap <leader>1 <esc>:cs find g <C-R>=expand("<cword>")<CR><CR>
+    " 1 or g: Find this definition
+    nmap <leader>1 :cs find g <C-R>=expand("<cword>")<CR><CR>
+    imap <leader>1 <esc>:cs find g <C-R>=expand("<cword>")<CR><CR>
 
-" 2 or d: Find functions called by this function
-nmap <leader>2 :cs find d <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
-imap <leader>2 <esc>:cs find d <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
+    " 2 or d: Find functions called by this function
+    nmap <leader>2 :cs find d <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
+    imap <leader>2 <esc>:cs find d <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
 
-" 3 or c: Find functions calling this function
-nmap <leader>3 :cs find c <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
-imap <leader>3 <esc>:cs find c <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
+    " 3 or c: Find functions calling this function
+    nmap <leader>3 :cs find c <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
+    imap <leader>3 <esc>:cs find c <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
 
-" 4 or t: Find this text string
-nmap <leader>4 :cs find t <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
-imap <leader>4 <esc>:cs find t <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
+    " 4 or t: Find this text string
+    nmap <leader>4 :cs find t <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
+    imap <leader>4 <esc>:cs find t <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
 
-" 6 or e: Find this egrep pattern
-nmap <leader>6 :cs find e <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
-imap <leader>6 <esc>:cs find e <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
+    " 6 or e: Find this egrep pattern
+    nmap <leader>6 :cs find e <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
+    imap <leader>6 <esc>:cs find e <C-R>=expand("<cword>")<CR><CR>:QFix<cr>
 
-" 7 or f: Find this file
-nmap <leader>7 :cs find f <C-R>=expand("<cfile>")<CR><CR>
-imap <leader>7 <esc>:cs find f <C-R>=expand("<cfile>")<CR><CR>
+    " 7 or f: Find this file
+    nmap <leader>7 :cs find f <C-R>=expand("<cfile>")<CR><CR>
+    imap <leader>7 <esc>:cs find f <C-R>=expand("<cfile>")<CR><CR>
 
-" 8 or i: Find files #including this file
-nmap <leader>8 :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:QFix<cr>
-imap <leader>8 <esc>:cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:QFix<cr>
+    " 8 or i: Find files #including this file
+    nmap <leader>8 :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:QFix<cr>
+    imap <leader>8 <esc>:cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:QFix<cr>
 
-set wildmenu
-set wcm=<Tab>
-menu Cscope.find_c_symbol :cs find s <C-R>=expand("<cword>")<CR><CR>
-menu Cscope.find_definition :cs find g <C-R>=expand("<cword>")<CR><CR>
-menu Cscope.find_functions_called_by_this_function :cs find d <C-R>=expand("<cword>")<CR><CR>
-menu Cscope.find_functions_calling_this_function :cs find c <C-R>=expand("<cword>")<CR><CR>
-menu Cscope.find_text_string :cs find t <C-R>=expand("<cword>")<CR><CR>
-menu Cscope.find_egrep_pattern :cs find e <C-R>=expand("<cword>")<CR><CR>
-menu Cscope.find_file :cs find f <C-R>=expand("<cfile>")<CR><CR>
-menu Cscope.find_files_including_this_file :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-nmap <leader>5 :emenu Cscope.<TAB>
+    if has("wildmenu")
+        set wildmenu
+        set wcm=<Tab>
+        menu Cscope.find_c_symbol :cs find s <C-R>=expand("<cword>")<CR><CR>
+        menu Cscope.find_definition :cs find g <C-R>=expand("<cword>")<CR><CR>
+        menu Cscope.find_functions_called_by_this_function :cs find d <C-R>=expand("<cword>")<CR><CR>
+        menu Cscope.find_functions_calling_this_function :cs find c <C-R>=expand("<cword>")<CR><CR>
+        menu Cscope.find_text_string :cs find t <C-R>=expand("<cword>")<CR><CR>
+        menu Cscope.find_egrep_pattern :cs find e <C-R>=expand("<cword>")<CR><CR>
+        menu Cscope.find_file :cs find f <C-R>=expand("<cfile>")<CR><CR>
+        menu Cscope.find_files_including_this_file :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+        nmap <leader>5 :emenu Cscope.<TAB>
+    endif " wildmenu
 
-" обновить cscope
-" nmap <leader>9 :!generate_cscope.sh<cr>:cs reset<cr>
-" imap <leader>9 <esc>:!generate_cscope.sh<cr>:cs reset<cr>a
+    " обновить cscope
+    " nmap <leader>9 :!generate_cscope.sh<cr>:cs reset<cr>
+    " imap <leader>9 <esc>:!generate_cscope.sh<cr>:cs reset<cr>a
 
 
+endif " has("cscope")
 
 
 "------------------------------------------------------------------------------
 "                           работа с ошибками и компилятором
 "------------------------------------------------------------------------------
 
-command -bang -nargs=? QFix call QFixToggle(<bang>0)
-function! QFixToggle(forced)
-  if exists("g:qfix_win") && a:forced == 0
-    cclose
-    unlet g:qfix_win
-  else
-    copen 15
-    let g:qfix_win = bufnr("$")
-  endif
-endfunction
+if has("quickfix")
 
-" открыть окно с сообщениями (результаты поиска, сообщения компилятора)
-nmap <C-E> :QFix<cr>
-imap <C-E> <esc>:QFix<cr>
+    command! -bang -nargs=? QFix call QFixToggle(<bang>0)
+    function! QFixToggle(forced)
+    if exists("g:qfix_win") && a:forced == 0
+        cclose
+        unlet g:qfix_win
+    else
+        if winheight(0) <= 30
+            let l:height = winheight(0) / 2
+        elseif winheight(0) >= 50
+            let l:height = winheight(0) / 3
+        else
+            let l:height = 15
+        endif
 
-" перейти к следующей ошибке
-nmap <F8> :cnext<cr>
-imap <F8> <esc>:cnext<cr>i
+        execute 'copen'.l:height
+        unlet l:height
+        let g:qfix_win = bufnr("$")
+    endif
+    endfunction
 
-" перейти к предыдущей ошибке
-nmap <F7> :cprev<cr>
-imap <F7> <esc>:cprev<cr>i
+    " открыть окно с сообщениями (результаты поиска, сообщения компилятора)
+    nmap <C-E> :QFix<cr>
+    imap <C-E> <esc>:QFix<cr>
 
-" F9 - "make" команда
+    " перейти к следующей ошибке
+    nmap <F8> :cnext<cr>zz
+    imap <F8> <esc>:cnext<cr>zzi
+
+    " перейти к предыдущей ошибке
+    nmap <F7> :cprev<cr>zz
+    imap <F7> <esc>:cprev<cr>zzi
+
+endif " has("quickfix")
+
+" F9 - "saveall + make" команда
 nmap <F9> :wa<cr>:make!<cr>
 imap <F9> <esc>:wa<cr>:make!<cr>
 
 " ctrl+F9 - "make clean" команда
 nmap <C-F9> :make! clean<cr>
 imap <C-F9> <esc>:make! clean<cr>
+
+" shift+F9 - "saveall + make clean + make" команда
+nmap <S-F9> :wa<cr>:make! clean<cr>:make!<cr>
+imap <S-F9> <esc>:wa<cr>:make! clean<cr>:make!<cr>
 
 
 
@@ -608,6 +666,8 @@ imap <C-Left> <esc>:bp<cr>i
 nmap <C-Right> :bn<cr>
 imap <C-Right> <esc>:bn<cr>i
 
+let g:bufExplorerSortBy='mru'
+
 
 
 
@@ -615,14 +675,16 @@ imap <C-Right> <esc>:bn<cr>i
 "                            выбор кодировки файла
 "------------------------------------------------------------------------------
 
-set wildmenu
-set wcm=<Tab>
-menu Encoding.koi8-r :e ++enc=8bit-koi8-r<CR>
-menu Encoding.windows-1251 :e ++enc=8bit-cp1251<CR>
-menu Encoding.ibm-866 :e ++enc=8bit-ibm866<CR>
-menu Encoding.utf-8 :e ++enc=2byte-utf-8 <CR>
-menu Encoding.ucs-2le :e ++enc=ucs-2le<CR>
-nmap <C-s>f :emenu Encoding.<TAB>
+if has("wildmenu") && has("multi_byte")
+    set wildmenu
+    set wcm=<Tab>
+    menu Encoding.koi8-r :e ++enc=8bit-koi8-r<CR>
+    menu Encoding.windows-1251 :e ++enc=8bit-cp1251<CR>
+    menu Encoding.ibm-866 :e ++enc=8bit-ibm866<CR>
+    menu Encoding.utf-8 :e ++enc=2byte-utf-8 <CR>
+    menu Encoding.ucs-2le :e ++enc=ucs-2le<CR>
+    nmap <C-s>f :emenu Encoding.<TAB>
+endif " has("wildmenu") && has("multi_byte")
 
 
 
@@ -631,13 +693,14 @@ nmap <C-s>f :emenu Encoding.<TAB>
 "                          выбор символа окончания файла
 "------------------------------------------------------------------------------
 
-set wildmenu
-set wcm=<Tab>
-menu EndOfLine.dos :e ++fileformat=dos<CR>
-menu EndOfLine.unix :e ++fileformat=unix<CR>
-menu EndOfLine.macos :e ++fileformat=mac<CR>
-nmap <C-s>e :emenu EndOfLine.<TAB>
-
+if has("wildmenu") && has("multi_byte")
+    set wildmenu
+    set wcm=<Tab>
+    menu EndOfLine.dos :e ++fileformat=dos<CR>
+    menu EndOfLine.unix :e ++fileformat=unix<CR>
+    menu EndOfLine.macos :e ++fileformat=mac<CR>
+    nmap <C-s>e :emenu EndOfLine.<TAB>
+endif " has("wildmenu") && has("multi_byte")
 
 
 
@@ -645,36 +708,59 @@ nmap <C-s>e :emenu EndOfLine.<TAB>
 "                               работа с diff
 "------------------------------------------------------------------------------
 
-function! DiffOrigToggle()
-    if exists("g:diff_file")
-        unlet g:diff_file
-        diffoff!
-        wincmd h
-        bd
-        syntax on
-    else
-        let g:diff_file = 1
-        syntax off
-        " Convenient command to see the difference between the current buffer and the
-        " file it was loaded from, thus the changes you made.
-        "command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis | wincmd p | diffthis
-        vert new | set bt=nofile | r # | 0d_ | diffthis | wincmd p | diffthis
+if has("diff")
+
+    function! DiffOrigToggle()
+        if bufname('%') == ""
+            echo "No original file"
+            return
+        endif
+
+        if exists("g:diff_file")
+            unlet g:diff_file
+            diffoff!
+            wincmd h
+            bd
+            syntax on
+            set scrolloff=3
+        else
+            if &diff
+                " do not run for (g)vimdiff
+                echo "We already in diff mode"
+            elseif getbufvar("%", "&mod") == 0
+                echo "File not modified"
+            else
+                let g:diff_file = 1
+                syntax off
+                set scrolloff=999
+                " Convenient command to see the difference between
+                " the current buffer and the file it was loaded from,
+                " thus the changes you made.
+
+                " command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis | wincmd p | diffthis
+                vert new | set bt=nofile | r # | 0d_ | diffthis | set foldcolumn=0 | wincmd p | diffthis | set foldcolumn=0
+            endif
+        endif
+    endfunction
+
+    nmap <C-g> :call DiffOrigToggle()<cr>
+    imap <C-g> <esc>:call DiffOrigToggle()<cr>
+
+    if has("scrollbind")
+        set scrollbind
+        set scrollopt="ver,hor,jump"
     endif
-endfunction
 
-nmap <C-g> :call DiffOrigToggle()<cr>
-imap <C-g> <esc>:call DiffOrigToggle()<cr>
+    if &diff
+        au VimEnter * windo set foldcolumn=0
+        au VimEnter * windo syntax off
+        au VimEnter * windo set diffopt=filler,context:8
+        if v:version >= 703 && has("gui_running")
+            au VimEnter * windo set cc=0
+        endif
+    endif
 
-set scrollbind
-set scrollopt="ver,hor,jump"
-
-if &diff
-    au VimEnter * windo set foldcolumn=0
-    au VimEnter * windo syntax off
-    au VimEnter * windo set diffopt=filler,context:8
-endif
-
-
+endif " diff
 
 
 "------------------------------------------------------------------------------
@@ -698,14 +784,21 @@ let Tlist_Enable_Fold_Column = 0
 
 let Tlist_Show_One_File = 1
 
+" использую свою, статическую сборку exuberant-ctags
+if (hostname() == "skip.nkbvs.tsure.ru")
+    let Tlist_Ctags_Cmd = "/home/skip/.vim/utils/ctags_i686"
+elseif (hostname() == "skip-note")
+    let Tlist_Ctags_Cmd = "/home/skip/.vim/utils/ctags_pentium_dual_core"
+else
+    let Tlist_Ctags_Cmd = "/home/skip/.vim/utils/ctags_i686"
+endif
+
 
 " если тэгов много, то будет открываться окно с вариантами
 " если тэг один, то будет произведене сразу переход
-nmap <C-l> g<C-]>
-imap <C-l> <esc>g<C-]>
-
-imap <C-]> <esc><C-]>
-imap <C-t> <esc><C-t>i
+nmap <C-]> g<C-]>zz
+imap <C-]> <esc>g<C-]>zzi
+imap <C-t> <esc><C-t>zzi
 
 " открыть тэг в новом табе и начать редактирование
 map <c-w>] <c-w>]:tab split<cr>gT:q<cr>gt
@@ -714,62 +807,13 @@ map <c-w>] <c-w>]:tab split<cr>gT:q<cr>gt
 
 
 "------------------------------------------------------------------------------
-"                                работаем с метками
-"------------------------------------------------------------------------------
-" используется плагин MarksBrowser (работает только с локальными метками)
-
-" открыть окно с метками
-nmap <S-F5> :MarksBrowser<cr>
-imap <S-F5> <esc>:MarksBrowser<cr>
-
-
-" перейти к началу функции
-"nmap <C-k> [[
-"imap <C-k> <esc>[[i
-
-" вернуться на место последнего jump'а
-" (так же может использоваться для возврата из
-" перехода к локальной или глобальной переменной - gd или gD соответственно)
-"nmap <C-S-k> ``
-"imap <C-S-k> <esc>``i
-
-
-
-
-"------------------------------------------------------------------------------
-"                            Работа с svn/cvs/svk репозиторием
-"------------------------------------------------------------------------------
-
-" используется плагин vcscommand
-
-" nmap <Leader>va <Plug>VCSAdd
-" nmap <Leader>vn <Plug>VCSAnnotate
-" nmap <Leader>vb <Plug>VCSBlame
-" nmap <Leader>vc <Plug>VCSCommit
-" nmap <Leader>vd <Plug>VCSDiff
-" nmap <Leader>vg <Plug>VCSGotoOriginal
-" nmap <Leader>vG <Plug>VCSGotoOriginal!
-" nmap <Leader>vi <Plug>VCSInfo
-" nmap <Leader>vl <Plug>VCSLog
-" nmap <Leader>vL <Plug>VCSLock
-" nmap <Leader>vr <Plug>VCSReview
-" nmap <Leader>vs <Plug>VCSStatus
-" nmap <Leader>vu <Plug>VCSUpdate
-" nmap <Leader>vU <Plug>VCSUnlock
-" nmap <Leader>vv <Plug>VCSVimDiff
-
-
-
-
-"------------------------------------------------------------------------------
 "                             Работа с комментариями
 "------------------------------------------------------------------------------
-" используется доработанный плагин vimcu ( Простой, но то что надо )
 
-map <F6> :CommentC<cr>j
-map <S-F6> :UnCommentC<cr>j
-imap <F6> <esc>:CommentC<cr>ja
-imap <S-F6> <esc>:UnCommentC<cr>ja
+map <F6> :DoComment<cr>j
+map <S-F6> :DoUnComment<cr>j
+imap <F6> <esc>:DoComment<cr>ja
+imap <S-F6> <esc>:DoUnComment<cr>ja
 
 
 
@@ -783,63 +827,49 @@ imap <S-F6> <esc>:UnCommentC<cr>ja
 set completeopt="menuone,preview"
 
 " Tab для omni completion
-imap <S-Tab> <C-X><C-O>
+"imap <S-Tab> <C-X><C-O>
 
+let OmniCpp_MayCompleteScope = 1
+let OmniCpp_ShowPrototypeInAbbr = 1
 
 
 
 "------------------------------------------------------------------------------
 "                             Работа с файловой системой
 "------------------------------------------------------------------------------
-" используется plugin NERD_tree
+" используется plugin NERD_tree (перешел на netrw)
 
-let g:NERDTreeMapActivateNode="<cr>"
-let g:NERDTreeQuitOnOpen=1
+" let g:NERDTreeMapActivateNode="<cr>"
+" let g:NERDTreeQuitOnOpen=1
+" let g:NERDTreeHijackNetrw=0
 
 " обозреватель файлов, используется плагин NERD_tree
-nmap <F12> :NERDTreeToggle<cr>
-imap <F12> <esc>:NERDTreeToggle<cr>
+" nmap <F12> :NERDTreeToggle<cr>
+" imap <F12> <esc>:NERDTreeToggle<cr>
+nmap <F12> :e.<cr>
+imap <F12> <esc>:e.<cr>
 
 
 
 
-"------------------------------------------------------------------------------
-"                             Работа с man, info страницами помощи
-"------------------------------------------------------------------------------
-" используется plugin manpageview
-
-let g:manpageview_multimanpage=0
-let g:manpageview_winopen="hsplit="
-
-
-
-
-set wildmenu
-"set wildmode=list,full
-set wildmode=list:longest,full
 
 "-----------------------------------------------------------------------------
 "-----------------------------------------------------------------------------
 "-----------------------------------------------------------------------------
 
 
+if has("wildmenu")
+    set wildmenu
+    "set wildmode=list,full
+    set wildmode=list:longest,full
+endif " wildmenu
 
 
-" Если ваш терминал поддерживает 256 цветов (вроде все новые
-" версии на данный момент), лучше это поставить:
-set t_Co=256
-
-
-colorscheme ir_black
-
-
+" Search pattern for the tag command is remembered for
+" "n" command.  Otherwise Vim only puts the pattern in
+" the history for search pattern, but doesn't change the
+" last used search pattern.
 set cpoptions+=t
-
-
-" To start using the ":Man" command before any manual page was loaded, source
-" this script from your startup vimrc file:
-"runtime ftplugin/man.vim
-
 
 
 " Don't use Ex mode, use Q for formatting
@@ -849,46 +879,97 @@ map Q gq
 " text is lost and it only works for putting the current register.
 "vnoremap p "_dp
 
+
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
-  syntax on
-  set hlsearch
+    if $TERM == "xterm" || $TERM == "xterm-linux"
+        " Если ваш терминал поддерживает 256 цветов (вроде все новые
+        " версии на данный момент), лучше это поставить:
+        set t_Co=256
+        " Make sure you put this _before_ the ":syntax enable" command,
+        " otherwise the colors will already have been set.
+        set background=dark
+        syntax enable
+        colorscheme ir_black
+        set hlsearch
 
-  " теперь сможем выделать зажав шифт и используя стрелки, pgup, pgdown
-  set keymodel=startsel
+        " теперь сможем выделять зажав шифт и используя стрелки, pgup, pgdown
+        set keymodel=startsel
+    elseif $TERM == "linux"
+        syntax enable
+        colorscheme default
+        set hlsearch
+    else
+        " unknown - try to enable syntax
+        syntax enable
+        set hlsearch
+    endif
+
+    " extended C syntax in c.vim for gcc
+    let c_gnu = 1
+
 endif
+
+function! <SID>StripTrailingWhitespaces()
+    " Preparation: save last search, and cursor position
+    let _s=@/
+    let l = line(".")
+    let c = col(".")
+    " Do the business
+    %s/\s\+$//e
+    " Clean up: restore previous search history, and cursor position
+    let @/=_s
+    call cursor(l, c)
+endfunction
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
 
-  " Enable file type detection.
-  " Use the default filetype settings, so that mail gets 'tw' set to 72,
-  " 'cindent' is on in C files, etc.
-  " Also load indent files, to automatically do language-dependent indenting.
-  filetype on
-  filetype indent on
-  filetype plugin on
+    " Enable file type detection.
+    " Use the default filetype settings, so that mail gets 'tw' set to 72,
+    " 'cindent' is on in C files, etc.
+    " Also load indent files, to automatically do language-dependent indenting.
+    filetype on
+    filetype indent on
+    filetype plugin on
 
-  " Put these in an autocmd group, so that we can delete them easily.
-  augroup vimrcEx
-  au!
+    " Put these in an autocmd group, so that we can delete them easily.
+    augroup vimrcEx
+        au!
 
-  au BufRead oc2000.s set tabstop=8
 
-  " When editing a file, always jump to the last known cursor position.
-  " Don't do it when the position is invalid or when inside an event handler
-  " (happens when dropping a file on gvim).
-  autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal g`\"" |
-    \ endif
+        " When editing a file, always jump to the last known cursor position.
+        " Don't do it when the position is invalid or when inside an event handler
+        " (happens when dropping a file on gvim).
+        autocmd BufReadPost *
+                    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+                    \   exe "normal g`\"" |
+                    \ endif
 
-  augroup END
+    augroup END
+
+    autocmd FileType c,cpp,java,asm,make,sh,vim autocmd BufWritePre <buffer> :call <SID>StripTrailingWhitespaces()
+
+    au FileType automake,make setlocal list noexpandtab
+
+    autocmd BufWinEnter * if getbufvar('%', '&buftype') == "quickfix" | set nocursorline | endif
+
+    if v:version >= 703 && has("gui_running")
+        au BufWinEnter * if getbufvar('%', '&filetype') == "cpp" ||
+                    \ getbufvar('%', '&filetype') == "c"         ||
+                    \ getbufvar('%', '&filetype') == "asm" | set cc=81 | else | set cc=0 | endif
+    endif
+
+    " for rtos baget 2.0 asm dump file viewing
+    au BufRead oc2000.s setlocal ts=8 sts=8 sw=8 noexpandtab
+
+    au BufEnter *.atoll set ft=atoll
+    au BufEnter *akefile* set ft=make
 
 else
 
-  set autoindent        " always set autoindenting on
+    set autoindent        " always set autoindenting on
 
 endif " has("autocmd")
 
@@ -896,9 +977,69 @@ set maxmem=2000000 " Maximum value 2000000. Use this to work without a limit.
 set maxmemtot=2000000 " Maximum value 2000000. Use this to work without a limit.
 set maxmempattern=2000000 " Maximum value 2000000. Use this to work without a limit.
 
-ino <c-tab> <c-r>=TriggerSnippet()<cr>
-snor <c-tab> <esc>i<right><c-r>=TriggerSnippet()<cr>
 
-autocmd FileType c,cpp,java autocmd BufWritePre <buffer> :call setline(1,map(getline(1,"$"),'substitute(v:val,"\\s\\+$","","")'))
+" vim-autocomplpop plugin settings
+" let g:acp_enableAtStartup = 0
+" let g:acp_ignorecaseOption = 0
+" let g:acp_behaviorKeywordLength = 5
+" let g:acp_mappingDriven = 1
+" autocmd FileType c,cpp,java,asm AcpEnable
 
+set shm+=I
 
+" let b:TypesFileLanguages = ['c', 'cpp'] " ctags_highlighting
+
+" let g:EchoFuncLangsUsed = ["c","cpp"]
+let g:EchoFuncLangsUsed = ["c"]
+
+nmap <C-_>   mF:call SmartTag#SmartTag("goto")<CR>
+imap <C-_>   <esc>mF:call SmartTag#SmartTag("goto")<CR>
+
+set cinoptions=l1,g0
+
+autocmd BufEnter svn-commit.tmp call setpos('.', [0, 1, 1, 0])
+
+function! QfMakeConv()
+    if &enc != &tenc
+        let qflist = getqflist()
+        for i in qflist
+            let i.text = iconv(i.text, &tenc, &enc)
+        endfor
+        call setqflist(qflist)
+    endif
+endfunction
+
+au QuickfixCmdPost make call QfMakeConv()
+
+set keymap=russian-jcukenwin
+set iminsert=0
+set imsearch=0
+highlight lCursor guifg=NONE guibg=Cyan
+
+" if &enc != &tenc
+    " set viminfo='100,<50,s10,h,n~/viminfo_koi8r
+    " echo &viminfo
+" endif
+
+if v:version >= 703
+    set conceallevel=0
+endif
+
+" Change name_with_underscores to NamesInCameCase for visually selected text.
+" mnemonic *c*amelCase
+vmap <leader>cc :s/_\([a-z]\)/\u\1/g<CR>
+
+" Change CamelCase to name_with_underscore for visually selected text.
+" mnemonic *u*nderscores.
+vmap <leader>cu :s/\<\@!\([A-Z]\)/\_\l\1/g<CR>gul
+
+noremap  <expr> <Home> (col('.') == matchend(getline('.'), '^\s*')+1 ? '0'  : '^')
+" noremap  <expr> <End>  (col('.') == match(getline('.'),    '\s*$')   ? '$'  : 'g_')
+" vnoremap <expr> <End>  (col('.') == match(getline('.'),    '\s*$')   ? '$h' : 'g_')
+imap <Home> <C-o><Home>
+" imap <End>  <C-o><End>
+
+" select previously inserted text
+nnoremap gp `[v`]
+
+set formatprg=par\ w80

@@ -27,7 +27,8 @@ if exists('&ofu')
 endif
 
 " Set 'comments' to format dashed lists in comments.
-setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,://
+" setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,://
+setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/
 
 " In VMS C keywords contain '$' characters.
 if has("vms")
@@ -63,10 +64,13 @@ endif
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
-nmap <F4> :!generate_tags.sh<cr>
-imap <F4> <esc>:!generate_tags.sh<cr>a
+" обновить тэги, ctags_highlight
+" nmap <F4> :wa<cr>:!~/.vim/utils/generate_tags.sh<cr>:UpdateTypesFileOnly<cr>
+nmap <F4> :wa<cr>:!~/.vim/utils/generate_tags.sh<cr>
+" imap <F4> <esc>:wa<cr>:!~/.vim/utils/generate_tags.sh<cr>:UpdateTypesFileOnly<cr>a
+imap <F4> <esc>:wa<cr>:!~/.vim/utils/generate_tags.sh<cr>a
 
 " обновить cscope
-nmap <leader>9 :!generate_cscope.sh<cr>:cs kill 0<cr>:cs add cscope.out<cr>
-imap <leader>9 <esc>:!generate_cscope.sh<cr>:cs kill 0<cr>:cs add cscope.out<cr>a
+nmap <leader>9 :!~/.vim/utils/generate_cscope.sh<cr>:cs kill 0<cr>:cs add cscope.out<cr>
+imap <leader>9 <esc>:!~/.vim/utils/generate_cscope.sh<cr>:cs kill 0<cr>:cs add cscope.out<cr>a
 

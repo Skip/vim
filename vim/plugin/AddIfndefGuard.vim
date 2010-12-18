@@ -5,7 +5,7 @@
 " happen.
 "
 " Some examples of what this script will do:
-" 
+"
 " filename: SFGameState.h
 " Inserted at top of file: #ifndef SFGAMESTATE_H
 "                          #define SFGAMESTATE_H
@@ -22,12 +22,17 @@
 " file. There is no way to automatically remove the added text, it can only be
 " removed by hand.
 "
-" 
+"
 " This script is in the public domain.
 "
 " Last Update: Saturday, 19th Febuary 2005
 " Maintainer: Rory McCann <ebelular at gmail dot com>
 
+" Script init stuff
+if exists("loaded_add_ifndef_guard")
+    finish
+endif
+let loaded_add_ifndef_guard = 1
 
 function AddIfndefGuard()
 
@@ -38,7 +43,7 @@ function AddIfndefGuard()
 	" function will only do stuff if uppercase_filename is nonempty
 
 	if strlen(s:uppercase_filename) != 0
-		
+
 		let s:header_guard = "__" . s:uppercase_filename . "_H__"
 
 		echo s:header_guard
@@ -46,7 +51,7 @@ function AddIfndefGuard()
 		" It's possible the user has already created ifndef guard code
 		" (or called this function on this file), so we need to check
 		" for that... in a later version. >:)
-		
+
 		" Add the text to the start and end of the file.
 
 		call append(0, "#ifndef ".s:header_guard)

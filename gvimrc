@@ -5,13 +5,25 @@ set cursorline
 set showtabline=2
 
 " высота statusline 1 строка
-set ch=1                
+set ch=1
 
-set background=light
+if (hostname() == "skip.nkbvs.tsure.ru")
+    " my work computer
+    set background=dark
+    colorscheme ir_black
+elseif (hostname() == "skip-note")
+    " my home computer
+    set background=dark
+    colorscheme ir_black_note
+else
+    " some another computer
+    set background=dark
+    colorscheme ir_black
+endif
 
-colorscheme pyte
+set winaltkeys=no
 
-" from book "Hacking VIM"
+" toggle menu and toolbar
 map <silent> <C-F2> :if &guioptions =~# 'T' <Bar>
                          \set guioptions-=T <Bar>
                          \set guioptions-=m <Bar>
@@ -30,7 +42,7 @@ set guioptions-=m
 set guioptions-=t
 set guioptions-=T
 
- 
+
 " прячем курсор во время набота текста
 set mousehide
 
@@ -41,18 +53,29 @@ set vb t_vb=
 
 if &diff
     if has("unix")
-        set guifont=Consolas\ 10,DejaVu\ Sans\ Mono\ 9,Terminus\ 10
+        if (hostname() == "skip.nkbvs.tsure.ru")
+            " my work computer
+            set guifont=Consolas\ 11,DejaVu\ Sans\ Mono\ 9,Terminus\ 10
+        elseif (hostname() == "skip-note")
+            " my home computer
+            set guifont=DejaVu\ Sans\ Mono\ 10,Terminus\ 10,Consolas\ 10
+        else
+            set guifont=DejaVu\ Sans\ Mono\ 10
+        endif
     elseif has("win16") || has("win32") || has("win64") || has("win95")
 
     endif
-    au VimEnter * windo set foldcolumn=0
-    au VimEnter * windo syntax off
-    au VimEnter * windo set diffopt=filler,context:8
 else
     " Устанавливает используемый X11 шрифт
     " используются по очереди только в случае отсутствия первых
     if has("unix")
-        set guifont=Consolas\ 11,Terminus\ bold\ 14,DejaVu\ Sans\ Mono\ 13
+        if (hostname() == "skip.nkbvs.tsure.ru")
+            set guifont=Consolas\ bold\ 13,Terminus\ bold\ 14,DejaVu\ Sans\ Mono\ 13
+        elseif (hostname() == "skip-note")
+            set guifont=DejaVu\ Sans\ Mono\ 11
+        else
+            set guifont=DejaVu\ Sans\ Mono\ 10
+        endif
     elseif has("win16") || has("win32") || has("win64") || has("win95")
 
     endif
