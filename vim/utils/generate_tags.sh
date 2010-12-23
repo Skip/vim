@@ -2,15 +2,7 @@
 
 base_path="/home/skip/.vim"
 
-if [ "$HOSTNAME" == "skip.nkbvs.tsure.ru" ]
-then
-    ctags=$base_path/"utils/ctags_i686"
-elif [ "$HOSTNAME" == "skip-note" ]
-then
-    ctags=$base_path/"utils/ctags_pentium_dual_core"
-else
-    ctags=$base_path/"utils/ctags_i686"
-fi
+ctags=$base_path/"utils/ctags"
 
 files_list="project_files.list"
 tags_file="tags"

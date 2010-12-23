@@ -64,3 +64,7 @@ function AddIfndefGuard()
 	endif
 
 endfunction
+
+nmap <S-F4> :call AddIfndefGuard()<CR>
+imap <S-F4> <ESC>:call AddIfndefGuard()<CR>i
+
