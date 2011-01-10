@@ -500,6 +500,7 @@ let OmniCpp_MayCompleteScope = 1
 let OmniCpp_ShowPrototypeInAbbr = 1
 
 let g:SuperTabMidWordCompletion=0
+let g:SuperTabCrMapping=0
 
 
 "------------------------------------------------------------------------------
